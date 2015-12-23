@@ -99,50 +99,32 @@ class Interpreter(object):
 
 		#set current token to the first token taken from the input
 		self.current_token = self.get_next_token()
-		
-		#we expect the current token to be a single-digit integer
-		
-			#sets left to the current_token then sends it to eat where it is replaced by the next token.
+				
 		left = 0
 		op = ''
 		right = 0
-		operator = False
+		operator_found = False
 
 		while self.current_token.type != 'EOF':
-			if operator == False:
+			if operator_found == False:
 				if self.current_token.type == 'INTEGER':
 					left = int(str(left) + str(self.current_token.value))
-					print self.current_token.type
-					print "Left side is", left
 					self.eat(INTEGER)
 				elif self.current_token.type == 'PLUS':
 					op = self.current_token.value
-					operator = True
+					operator_found = True
 					self.eat(PLUS)
-					print operator
-					print "operator is", op 
-			elif operator == True:
+			elif operator_found == True:
 				if self.current_token.type == 'INTEGER':
 					right = int(str(right) + str(self.current_token.value))
 					self.eat(INTEGER)
-					print "right side is", right
-						
-		
-		#after the above call the self.current_token is set to
-		#EOF toekn
-		
-		#at this point INTEGER PLUS INTEGER sequence of tokens
-		# has been successfully found and the method can just
-		# return the result of adding two integers, thus
-		# effectivey interpreting client input
+	
 		result = left + right
 		return result
 		
 def main():
 	while True:
 		try:
-			#to run under python3 replace 'raw_input' call
-			# with ''input'
 			text = raw_input('calc>')
 		except EOFError:
 			break
