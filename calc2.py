@@ -3,7 +3,7 @@
 #EOF (end-of-file) token is used to indicate that 
 #there is no more input left for lexical analysis	
 #initialises the variables INTEGER, PLUS, AND EOF equal to INTEGER, PLUS, AND EOF.
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER, PLUS, EOF, SPACE = 'INTEGER', 'PLUS', 'EOF', 'SPACE'
 
 
 	
@@ -42,8 +42,8 @@ class Interpreter(object):
 		#current token instance
 		self.current_token = None
 		
-	def error(self):
-		raise Exception('Error parsing input')
+	def error(self, message):
+		raise Exception('Error parsing input', message)
 		
 	def get_next_token(self):
 		"""Lexical analyzer (also known as scanner or tokenizer)
@@ -58,8 +58,8 @@ class Interpreter(object):
 		#if so, then return EOF token because there is no more
 		#input left to convert into tokens
 		
-			#If the pos is higher than the length of the string then it sets the token to end of file.
 		if self.pos > len(text) -1:
+			print "Token is EOF"
 			return Token(EOF, None)
 			
 		#get a character at the position self.pos and decide
@@ -73,16 +73,25 @@ class Interpreter(object):
 		# index to point to the next character after the digit, 
 		# and return the INTEGER token
 		if current_char.isdigit():
+			print "Token is INTEGER"
 			token = Token(INTEGER, int(current_char))
 			self.pos += 1
+			print token
 			return token
-			
-		if current_char == '+':
+		elif current_char == '+':
+			print "Token is PLUS"
 			token = Token(PLUS, current_char)
 			self.pos += 1
+			print token
 			return token
-			
-		self.error()
+		elif current_char == ' ':
+			print "Token is SPACE"
+			token = Token(SPACE, current_char)
+			self.pos += 1
+			print token
+			return token
+		else:
+			self.error("get_next_token: Can't figure out what token to assign.")
 		
 	def eat(self, token_type):
 	# compare the current token type with the passed token
@@ -92,7 +101,7 @@ class Interpreter(object):
 		if self.current_token.type == token_type:
 			self.current_token = self.get_next_token()
 		else:
-			self.error()
+			self.error("eat: Trouble eating the current token")
 	
 	def expr(self):
 		"""expr -> INTEGER PLUS INTEGER"""
@@ -106,6 +115,9 @@ class Interpreter(object):
 		operator_found = False
 
 		while self.current_token.type != 'EOF':
+			if self.current_token.type == 'SPACE':
+				self.eat(SPACE)
+	
 			if operator_found == False:
 				if self.current_token.type == 'INTEGER':
 					left = int(str(left) + str(self.current_token.value))
